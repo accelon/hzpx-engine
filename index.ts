@@ -84,3 +84,4 @@ export const Hzpx={addFontData,ready,drawPinx,loadFont, inject, render , onoff};
 
 if (typeof window!=='undefined' && !window.Hzpx) window.Hzpx=Hzpx;
 
+export default Hzpx;
