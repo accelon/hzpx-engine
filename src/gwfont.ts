@@ -4,6 +4,7 @@ import {Frame} from './interfaces.ts';
 let cjkbmp:StringArray;
 let cjkext:StringArray;
 let gwcomp:StringArray; 
+
 export const getGID=(id:string|number):string=>{ //replace versioning , allow code point or unicode char
 	let r='';
 	if (typeof id==='number') return ch2gid(id);
@@ -82,12 +83,6 @@ export function frameOf(gd:string, rawframe:string=''):Frame[] {
 	}
 	return frames;
 }
-export const loadFont=(comp:string,bmp:string,ext:string)=>{
-  gwcomp=new StringArray(comp,'='); //component gid as key
-  cjkbmp=new StringArray(bmp);      // array index = codepoint - 0x3400
-  cjkext=new StringArray(ext);      // array index = codepoint - 0x2000 
-  return {gwcomp,cjkbmp,cjkext};    // client should not access the StringArray directly
-}
 
 export const gid2ch=(gid:string)=> {
 	if (gid[0]!=='u') return ' ';
@@ -121,4 +116,18 @@ export const componentsOfGD=(d:string,returnid=false)=>{
 	loadComponents(d,comps);
 	const out=Object.keys(comps);
 	return returnid?out:out.map( gid2ch );
+}
+export const addFontData=(key:string,data:string)=>{
+	if (key=='gwcomp') gwcomp=new StringArray(data,'=');//component gid as key
+	else if (key=='cjkbmp') cjkbmp=new StringArray(data); // array index = codepoint - 0x3400
+	else if (key=='cjkext') cjkext=new StringArray(data); // array index = codepoint - 0x2000 
+	else throw "wrong font key";
+}
+export const isFontReady=()=>gwcomp&&cjkbmp&&cjkext;
+
+export const loadFont=(comp:string,bmp:string,ext:string)=>{
+	addFontData('gwcomp',comp);
+	addFontData('cjkbmp',bmp);
+	addFontData('cjkext',ext);
+  return {gwcomp,cjkbmp,cjkext};    // client should not access the StringArray directly
 }

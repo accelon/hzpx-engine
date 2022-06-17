@@ -1,1 +1,1 @@
-esbuild --watch ui-src\index.ts --bundle --outfile=public\bundle.js
+esbuild --watch index.ts --format=iife --bundle --outfile=dist\hzpx.js

@@ -55,7 +55,7 @@ export const drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 
 	const d=getGlyph(gid);
 
-	if (!d) return alt?unicode:''
+	if (!d) return unicode;
 	
 	loadComponents(d,components);
 	for (let comp in components) {
@@ -68,7 +68,7 @@ export const drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 	pxe.makeGlyph(polygons, gid);
 	let svg=polygons.generateSVG(true);
 	svg = opts.frame?addFrameToSVG(d,svg):svg;
-	svg = patchSVG(svg, 'gid='+gid+ ' title='+unicode);
+	svg = patchSVG(svg, 'style="padding-top:0.2em" gid='+gid+ ' title='+unicode);
 	if (color!=='black' && color) svg = patchColor(svg, color);
 	return resizeSVG( svg,size);
 }
@@ -116,7 +116,7 @@ export const drawPinxChar=(ire,opts: DrawGlyphOptions={})=>{
 	let svg=polygons.generateSVG(true);
 	appends.forEach(append=>svg=appendToSVG(append,svg));
 	svg = opts.frame?addFrameToSVG(d,svg):svg;
-	svg = patchSVG(svg, 'title='+ire);
+	svg = patchSVG(svg, 'style="padding-top:0.2em" title='+ire);
 	if (opts.color!=='black' && opts.color) svg = patchColor(svg, opts.color);
 	svg = resizeSVG(svg,size);
 	return svg;

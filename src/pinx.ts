@@ -1,10 +1,10 @@
 import {getGlyph,loadComponents,componentsOf, ch2gid, gid2ch,factorsOfGD} from './gwfont.js'
 import {splitUTF32Char,codePointLength,alphabetically,intersect} from "ptk/utils"
 
-export const autoIRE=(ch,base)=>{
-	if (ch==base) return ''
+export const autoPinx=(ch,base)=>{
+	if (ch==base || !base) return ''
 	const f1=factorsOfGD( getGlyph(ch), true);
-	const f2=factorsOfGD( gettGlyph(base)).map(it=> UnifiedComps_UTF32[it]||it );
+	const f2=factorsOfGD( getGlyph(base)).map(it=> UnifiedComps_UTF32[it]||it );
 	// if (ch==='䭙') console.log(f1,f2.map(it=>String.fromCodePoint(it)),ch,base)
 	const commonpart=intersect(f1,f2);
 	const from=f2.filter(it=>commonpart.indexOf(it)==-1);
@@ -38,7 +38,7 @@ export const splitPinx=(str:string, tryAutoIRE=false)=>{
 				} else {
 					let ch=chars[i];
 					if (tryAutoIRE&&!getGlyph(ch)) { //not found, try to replace with ire
-						ch=autoIRE(ch) || ch;
+						ch=autoPinx(ch) || ch;
 					}
 					out.push(ch)
 				}

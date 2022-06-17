@@ -1,0 +1,1 @@
+esbuild index.ts --format=cjs --bundle --outfile=index.js
