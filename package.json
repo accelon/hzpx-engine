@@ -1,6 +1,6 @@
 {
   "name": "hzpx",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "hzpx backend in Typescript",
   "main": "index.js",
   "devDependencies": {

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <link rel="icon" href="data:;base64,=">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>汉字拼形组字系统</title>
+    <style>
+      #bigfortune {font-size: 3em}
+      #cjkextension {display: flex} /* 用 flex 去除多余的空白*/
+      #sunzi  {font-size: 1.5em ; color: brown; display: flex}
+      #chu    {font-size:  2em; color: gray; display: flex}
+    </style>
+    <!-- 可從 "https://www.skypack.dev/hzpx  加载 
+         离线使用和 html 档放在一起即可。 hzpx.js 必須先加载
+    -->
+    <script src="hzpx.js"></script>   <!-- 组字程序 -->
+    <script src="gwcomp.js"></script> <!-- 构字元件 -->
+    <script src="cjkbmp.js"></script> <!-- 基本字和Ext A 27000 -->
+    <script src="cjkext.js"></script> <!-- Extension BCDEFG 60000 -->
+
+    <script>
+    (async ()=>{
+      await Hzpx.ready();                         /* 要等字库加载成功 */
+      Hzpx.render(cjkextension);                  /* 画出 glyph2.innerText */ 
+      Hzpx.render(bigfortune,'邏羅寶貝𩀨從䞃致招');  /* 画出文字，生成所有文字，返回被替代的文字 */
+      Hzpx.inject(sunzi,{cjk:'ABCDEFG'});          /* 生成A~G 区的字，其余字不変*/
+      Hzpx.inject(chu);                           /* 生成组字，其余字不変 可改 pair:'︻︼' */      
+    })(); /* 目前3浏览器还不支持 第一级  await ，必须用 async 函式包住 */
+    </script>
+  </head>
+  <body>
+    <h2>汉字拼形 HTML 应用模块 API 呼叫演示</h2>
+    <br/>本模块不依赖http，可以用於离线环境（如基於HTML+JS的电子书阅读软件）
+    <br/>按鼠標右键检查 本页之HTML源代码会更清楚用法。 欢迎到<a target=_new href="https://github.com/accelon/hzpx-engine/"> Github協作</a>
+
+    <br/>1)替代式：将整个HTML元素替代为生成字形，适合字头或标题。语法 Hzpx.render(HTMLElement,text?:string)    
+    <div id="bigfortune">看不見招財進寶</div>
+    <div id="cjkextension">CJK 扩A㐀B𠀀C𪜀D𫝀E𫠠F𬺰G𰀀</div>
+    <br/>
+    <br/>2)植入式：只生成扩区字和组字，其余不变，适合內文。 Hzpx.inject(HTMLElement,{pair='︻︼', cjk='CDEFG'})
+    <br/>组字要用︻︼包起來。即︻初衤礻︼
+    <div id="chu">「初」常被写成「︻初衤礻︼」</div>
+    扩区字
+    <div id="sunzi">食敵一鍾，當吾二十鍾；𦮼稈一石，當吾二十石。</div>
+    <br/>欢迎到<a target=_new href="https://forum.freemdict.com/u/accelon">FreeMdict</a>提出建议。
+  </body>
+</html>

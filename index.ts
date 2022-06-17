@@ -8,7 +8,8 @@ const replaceReg=/\07([^\07]+)\07/g
 
 export const extractReplacable=(html,opts={}) =>{
 	const pair=opts.pair||'︻︼';
-	const cjkranges=(opts.cjk||'CDEFG').toUpperCase().split('').map(s=>'Ext'+s); //match the CJKRangeName
+	const cjk=opts.cjk||'ABCDEFG';
+	const cjkranges=cjk.toUpperCase().split('').map(s=>'Ext'+s); //match the CJKRangeName
 
 	let out='', nreplace=0;
 	const toReplace=[];  // keep the parameters for drawPinx, array index is \07idx\07 svg insert point
@@ -79,9 +80,25 @@ export const ready=()=>{
 }
 let onOff=true;
 export const onoff=(_onoff:boolean)=>onOff=_onoff;
-
+export const renderSelector=(selector?:string='.hzpx')=>{
+	const eles=document.querySelectorAll(selector);
+	eles.forEach(ele=>{
+		const t=ele.innerText;
+		if (t.length<20 && t.match(/^[\u3400-\u9fff\ud400-\udfff]+$/)) {
+			Hzpx.render(ele);
+		} else {
+			Hzpx.inject(ele);
+		}
+	})
+}
 export const Hzpx={addFontData,ready,drawPinx,loadFont, inject, render , onoff};
 
 if (typeof window!=='undefined' && !window.Hzpx) window.Hzpx=Hzpx;
+
+setTimeout(async ()=>{
+	await Hzpx.ready();
+	renderSelector();
+},100);
+
 
 export default Hzpx;
