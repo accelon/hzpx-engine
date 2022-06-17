@@ -1,9 +1,12 @@
 {
   "name": "hzpx",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "hzpx backend in Typescript",
   "main": "index.js",
-  "devDependencies": {},
+  "devDependencies": {
+    "kage-engine":"https://github.com/yapcheahshen/kage-engine#v0.4.1",
+    "ptk":"https://github.com/accelon/ptk"
+  },
   "scripts": {
     "test": "node test.js",
     "dev-ui":"esbuild --watch index.ts --format=iife --bundle --outfile=dist/hzpx.js",
@@ -20,9 +23,5 @@
   "bugs": {
     "url": "https://github.com/accelon/hzpx-engine/issues"
   },
-  "homepage": "https://github.com/accelon/hzpx-engine#readme",
-  "dependencies": {
-    "kage-engine":"https://github.com/yapcheahshen/kage-engine#v0.4.1",
-    "ptk":"https://github.com/accelon/ptk#v0.0.1"
-  }
+  "homepage": "https://github.com/accelon/hzpx-engine#readme"
 }
