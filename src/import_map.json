@@ -1,0 +1,6 @@
+{
+	"imports":{
+		"ptk/utils":"../ptk/utils/index.ts",
+		"kage-engine":"../../github/kage-engine/src/index.ts"
+	}
+}

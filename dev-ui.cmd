@@ -1,0 +1,1 @@
+esbuild --watch ui-src\index.ts --bundle --outfile=public\bundle.js
