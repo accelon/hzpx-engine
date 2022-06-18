@@ -1,4 +1,4 @@
-﻿import {StringArray,codePointLength} from 'ptk/utils'
+﻿import {StringArray,codePointLength,splitUTF32Char} from 'ptk/utils'
 import {unpackGD} from './gwpacker.ts';
 import {Frame} from './interfaces.ts';
 let cjkbmp:StringArray;
@@ -117,6 +117,13 @@ export const componentsOfGD=(d:string,returnid=false)=>{
 	const out=Object.keys(comps);
 	return returnid?out:out.map( gid2ch );
 }
+export const getLastComps=(value:string)=>{
+	if (!value) return [];
+	const chars=splitUTF32Char(value);
+	if (!chars.length) return [];
+	return componentsOf(chars[chars.length-1]);
+}
+
 export const addFontData=(key:string,data:string)=>{
 	if (key=='gwcomp') gwcomp=new StringArray(data,'=');//component gid as key
 	else if (key=='cjkbmp') cjkbmp=new StringArray(data); // array index = codepoint - 0x3400

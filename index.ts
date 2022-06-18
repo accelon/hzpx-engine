@@ -1,5 +1,4 @@
 import {CJKRangeName,splitUTF32Char} from 'ptk/utils'
-
 const inRange=(s:string,cjkranges:string[] )=>{
 	const rangename=CJKRangeName(s);
 	return ~cjkranges.indexOf(rangename);
@@ -61,7 +60,7 @@ export const render=(ele:HTMLElement, text=''):void=>{
 	return ele.innerText;
 }
 
-import {loadFont,addFontData,isFontReady} from './src/gwfont.ts'
+import {loadFont,addFontData,isFontReady,getLastComps} from './src/gwfont.ts'
 import {drawPinx} from './src/drawglyph.ts'
 export const ready=()=>{
 	return new Promise(resolve=>{
@@ -78,7 +77,7 @@ export const renderSelector=(selector?:string='.hzpx')=>{
 	const eles=document.querySelectorAll(selector);
 	eles.forEach(ele=>Hzpx.inject(ele))
 }
-export const Hzpx={addFontData,ready,isFontReady, drawPinx,loadFont, inject, render};
+export const Hzpx={addFontData,ready,isFontReady, drawPinx,loadFont, inject, render,getLastComps};
 
 if (typeof window!=='undefined' && !window.Hzpx) {
 	window.Hzpx=Hzpx;
@@ -92,5 +91,5 @@ setTimeout(async ()=>{
 	renderSelector();
 },1);
 
-export {addFontData,isFontReady, drawPinx, loadFont};
+export {addFontData,isFontReady, drawPinx, loadFont,getLastComps};
 export default Hzpx;
