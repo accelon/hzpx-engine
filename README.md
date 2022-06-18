@@ -3,7 +3,9 @@ hzpx backend in Typescript
 
 ## prerequsite 
 - esbuild
-- prebuild glyphwiki font
+- [prebuild glyphwiki font](https://github.com/accelon/hzpx/) 
+- put cjkbmp.js cjkext.js gwcomp.js in dist
+- put cjkbmp.mjs cjkext.mjs gwcomp.mjs in extension
 
 run esbuild background watch to test offline application
 

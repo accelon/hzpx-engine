@@ -1,1 +1,1 @@
-esbuild --bundle --format=iife --minify index.ts --outfile=dist\hzpx.min.js
+esbuild --bundle --format=iife  index.ts --outfile=dist/hzpx.js
