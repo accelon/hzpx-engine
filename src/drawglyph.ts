@@ -2,7 +2,7 @@
 import {getFontFace,enumFontFace } from './fontface.ts'
 import {Kage} from 'kage-engine'
 import {splitUTF32,codePointLength} from 'ptk/utils'
-import {splitPinx,validIRE} from './pinx.js'
+import {splitPinx,validIRE} from './pinx.ts'
 import {DrawGlyphOptions} from './interfaces.ts';
 
 let pxe = new Kage();
@@ -36,7 +36,7 @@ const addFrameToSVG=(gd:string,svg:string)=>{
 	}
 	return appendToSVG(framesvg,svg);
 }
-export const drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
+export const  drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 	if (!unicode) return '';
 	const components={};
 	const size=opts.size||64;
@@ -56,8 +56,8 @@ export const drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 	const d=getGlyph(gid);
 
 	if (!d) return unicode;
-	
 	loadComponents(d,components);
+
 	for (let comp in components) {
 		pxe.kBuhin.push(comp,components[comp]);
 	}
@@ -75,7 +75,7 @@ export const drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 export const drawPinxChar=(ire,opts: DrawGlyphOptions={})=>{
 	const chars=splitUTF32(ire);
 
-	if (!validIRE(ire)) return drawGlyphs(ire);
+	if (!(validIRE(ire))) return drawGlyphs(ire);
 	let i=0,polygons = new Kage.Polygons();
 	const size=opts.size||64;
 	let appends=[];
@@ -129,7 +129,7 @@ export const drawPinx=(str:string,opts: DrawGlyphOptions={})=>{
     const out=[]
     for (let i=0;i<units.length;i++) {
     	const u=units[i];
-    	out.push( (codePointLength(u)==1? drawGlyph(u,opts): drawPinxChar(u,opts)))
+    	out.push( (codePointLength(u)==1? (drawGlyph(u,opts)): (drawPinxChar(u,opts))))
     }
 	return out;
 }

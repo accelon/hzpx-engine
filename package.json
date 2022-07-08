@@ -9,9 +9,12 @@
   },
   "scripts": {
     "test": "node test.js",
+    "dev-packer":"esbuild --watch node.ts --format=cjs --bundle --outfile=nodebundle.js",
+    "dev":"esbuild --watch index.ts --format=cjs --bundle --outfile=index.js",
     "dev-ui":"esbuild --watch index.ts --format=iife --bundle --outfile=dist/hzpx.js",
+    "build":"esbuild index.ts --format=cjs --bundle --outfile=index.js",
     "build-ui":"esbuild --minify index.ts --format=iife --bundle --outfile=dist/hzpx.min.js",
-    "build":"esbuild index.ts --format=cjs --bundle --outfile=index.js"
+    "build-packer":"esbuild --watch node.ts --format=cjs --bundle --outfile=nodebundle.js"
   },
   "repository": {
     "type": "git",

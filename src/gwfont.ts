@@ -1,9 +1,14 @@
-﻿import {StringArray,codePointLength,splitUTF32Char} from 'ptk/utils'
+﻿import {StringArray,bsearch,codePointLength,splitUTF32Char,LineBase,unpackStrings} from 'ptk'
 import {unpackGD} from './gwpacker.ts';
 import {Frame} from './interfaces.ts';
+
 let cjkbmp:StringArray;
 let cjkext:StringArray;
-let gwcomp:StringArray; 
+let gwcompvalues:StringArray;
+let gwcompkeys:StringArray;
+let lbase ;
+let gidarr=[] // bsearchable gid off components
+let bmp_starts,ext_starts,gwcomp_starts;
 
 export const getGID=(id:string|number):string=>{ //replace versioning , allow code point or unicode char
 	let r='';
@@ -22,19 +27,30 @@ export const getGlyph=(s:string|number)=>{
 	if (!s||( typeof s=='string' && (s.codePointAt(0)||0)>0xff && codePointLength(s)>1)) {
 		return ''; //is an ire
 	}
+	let lbaseline;
 	const gid=getGID(s);
 	const m=gid.match(/^u([\da-f]{4,5})$/);
 	if (m) {
 		const cp=parseInt(m[1],16);
 		if (cp>=0x20000) {
-			const gd=cjkext.get( cp-0x20000 +1 );
-			return unpackGD(gd);
+			lbaseline=ext_starts+cp-0x20000 ;
 		} else if (cp>=0x3400 && cp<0x9FFF) {
-			const gd=cjkbmp.get( cp-0x3400 + 1 );
-			return unpackGD(gd);
+			lbaseline=bmp_starts+cp-0x3400  ;
+		}
+	} else {
+		const at=bsearch(gidarr,gid);
+		if (gid==gidarr[at]) {
+			lbaseline=gwcomp_starts+at;
+		} else {
+			return;
 		}
 	}
-	return unpackGD(gwcomp.getValue(gid));
+	if (typeof lbaseline=='undefined') return;
+
+	//assuming all read are loaded, recursive await is very slow
+	const gd=lbase.slice(lbaseline)[0];
+	
+	return unpackGD(gd);
 }
 let depth=0;
 export const loadComponents=(data,compObj,countrefer=false)=>{ //enumcomponents recursively
@@ -109,7 +125,7 @@ export const factorsOfGD=(gd:string,gid:string)=>{
 }
 export const componentsOf=(ch,returnid=false)=>{
 	const d=getGlyph(ch);
-	return componentsOfGD(d,returnid).filter(it=>it!==ch);
+	return (componentsOfGD(d,returnid)).filter(it=>it!==ch);
 }
 export const componentsOfGD=(d:string,returnid=false)=>{
 	const comps={};
@@ -123,18 +139,40 @@ export const getLastComps=(value:string)=>{
 	if (!chars.length) return [];
 	return componentsOf(chars[chars.length-1]);
 }
-
+/*
 export const addFontData=(key:string,data:string)=>{
 	if (key=='gwcomp') gwcomp=new StringArray(data,'=');//component gid as key
 	else if (key=='cjkbmp') cjkbmp=new StringArray(data); // array index = codepoint - 0x3400
 	else if (key=='cjkext') cjkext=new StringArray(data); // array index = codepoint - 0x2000 
 	else throw "wrong font key";
 }
-export const isFontReady=()=>gwcomp&&cjkbmp&&cjkext;
-
-export const loadFont=(comp:string,bmp:string,ext:string)=>{
+*/
+//
+/*
+export const loadJsFont=(comp:string,bmp:string,ext:string)=>{
 	addFontData('gwcomp',comp);
 	addFontData('cjkbmp',bmp);
 	addFontData('cjkext',ext);
   return {gwcomp,cjkbmp,cjkext};    // client should not access the StringArray directly
+}
+*/
+export const isFontReady=()=>!!lbase;
+export const loadFont=async (zip)=>{ //see hzpx/pack-glyphwiki.js
+	if (lbase) return lbase;	
+	console.time('loadfont')
+	lbase=new LineBase({name:"hzpx",zip});
+	await lbase.isReady();
+	gwcomp_starts=lbase.sectionRange('gwcomp')[0];
+	bmp_starts=lbase.sectionRange('bmp')[0];
+	let ends;//ends of glyphwiki data
+	[ext_starts,ends]=lbase.sectionRange('ext');
+	// await lbase.loadLines(lbase.sectionRange('gid')  );
+	await lbase.loadLines(0, ends); // recursive await is very slow 
+
+	const packedstrings=lbase.slice(0,1)[0];
+	gidarr=unpackStrings(packedstrings);
+
+	//console.log(gwcomp_starts,bmp_starts,ext_starts);
+	console.timeEnd('loadfont')
+	return lbase;
 }

@@ -4,7 +4,7 @@ hzpx backend in Typescript
 ## prerequsite 
 - esbuild
 - [prebuild glyphwiki font](https://github.com/accelon/hzpx/) 
-- put cjkbmp.js cjkext.js gwcomp.js in dist
+- put hzpx/.js or hzpx.ptk in dist
 - put cjkbmp.mjs cjkext.mjs gwcomp.mjs in extension
 
 run esbuild background watch to test offline application
@@ -15,6 +15,10 @@ to pack a minified bundle
 
     npm run build 
 
+
+to create hzpx.ptk font ( need ptk/nodebundle.cjs)
+   npm run build-bundle
+   node gen-ptk.js
 
 ## usage
 

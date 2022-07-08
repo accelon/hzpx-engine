@@ -4,7 +4,7 @@ import {splitUTF32Char,codePointLength,alphabetically,intersect} from "ptk/utils
 export const autoPinx=(ch,base)=>{
 	if (ch==base || !base) return ''
 	const f1=factorsOfGD( getGlyph(ch), true);
-	const f2=factorsOfGD( getGlyph(base)).map(it=> UnifiedComps_UTF32[it]||it );
+	const f2=factorsOfGD( (getGlyph(base))).map(it=> UnifiedComps_UTF32[it]||it );
 	// if (ch==='䭙') console.log(f1,f2.map(it=>String.fromCodePoint(it)),ch,base)
 	const commonpart=intersect(f1,f2);
 	const from=f2.filter(it=>commonpart.indexOf(it)==-1);
@@ -49,4 +49,4 @@ export const splitPinx=(str:string, tryAutoIRE=false)=>{
 	ire&&out.push(ire)
 	return out;
 }
-export const validIRE=(ire:string):boolean=>codePointLength(ire)>1 && splitPinx(ire).length==1;
+export const validIRE=(ire:string):boolean=>codePointLength(ire)>1 && (splitPinx(ire)).length==1;
