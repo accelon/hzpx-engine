@@ -3,10 +3,10 @@
     or     hzpx/*.js  jsonp format
 
 */
-const jsonp=false;    //create jsonp 
+const jsonp=true;    //create jsonp 
 const compress=false;  // zip with compression
 
-const {LineBase,Column,nodefs,readTextLines,writeChanged,alphabetically,
+const {LineBase,Column,nodefs,readTextLines,writeChanged,alphabetically,alphabetically0,
 	splitUTF32,bsearch, packStrings,escapeTemplateString,fromObj,writePitaka}=require('ptk/nodebundle.cjs');
 
 //run ptk/dev-cjs.cmd to get common js version of ptk
@@ -115,19 +115,20 @@ for (let i=0;i<gw.length;i++) {
 
 	}
 	if (!done ) {
-		gwcomp.push( gid+'='+packedgd ); //don not pack the gid 
+		gwcomp.push( gid+'\t'+packedgd ); //don not pack the gid 
 	}
 }
 
 //console.log(cjkbmp.length,cjkext.length , gwcomp.length)
 const createPitaka=async ()=>{
 		//break gwcomp to and 
+	  gwcomp.sort(alphabetically0)
 	  const column=new Column();
-	  const out=column.fromLexicon(gwcomp);
+	  const out=column.fromTSV(gwcomp);
 		const lbase=new LineBase();
 		const keys=packStrings(column.keys) ;
 		lbase.append( keys , 'gid', 'strings');
-		lbase.append( column.values , 'gwcomp');
+		lbase.append( column.values[0] , 'gwcomp');
 		lbase.append( cjkbmp,'bmp');
 		lbase.append( cjkext,'ext');
 
@@ -136,6 +137,8 @@ const createPitaka=async ()=>{
 }
 createPitaka();
 };
+
+
 main();
 
 const writePureJS=()=>{
