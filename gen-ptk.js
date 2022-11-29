@@ -122,10 +122,10 @@ for (let i=0;i<gw.length;i++) {
 //console.log(cjkbmp.length,cjkext.length , gwcomp.length)
 const createPitaka=async ()=>{
 		//break gwcomp to and 
-	  gwcomp.sort(alphabetically0)
-	  const column=new Column();
-	  const out=column.fromTSV(gwcomp);
-		const lbase=new LineBase();
+	    gwcomp.sort(alphabetically0)
+	    const column=new Column();
+	    column.fromTSV(gwcomp);
+	    const lbase=new LineBase();
 		const keys=packStrings(column.keys) ;
 		lbase.append( keys , 'gid', 'strings');
 		lbase.append( column.values[0] , 'gwcomp');

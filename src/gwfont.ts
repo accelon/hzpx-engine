@@ -1,14 +1,9 @@
-﻿import {StringArray,bsearch,codePointLength,splitUTF32Char,LineBase,unpackStrings} from 'ptk'
+﻿import {openPtk,StringArray,bsearch,codePointLength,splitUTF32Char,LineBase,unpackStrings,LEMMA_DELIMITER} from 'ptk'
 import {unpackGD} from './gwpacker.ts';
 import {Frame} from './interfaces.ts';
-
-let cjkbmp:StringArray;
-let cjkext:StringArray;
-let gwcompvalues:StringArray;
-let gwcompkeys:StringArray;
-let lbase ;
-let gidarr=[] // bsearchable gid off components
-let bmp_starts,ext_starts,gwcomp_starts;
+let ptk ;
+let gidarr; // bsearchable gid off components
+let bmp_starts,ext_starts,gwcomp_starts,ebag_starts;
 
 export const getGID=(id:string|number):string=>{ //replace versioning , allow code point or unicode char
 	let r='';
@@ -17,7 +12,7 @@ export const getGID=(id:string|number):string=>{ //replace versioning , allow co
 		if ( (id.codePointAt(0)||0) >0x2000) {
 			id='u'+(id.codePointAt(0)||0).toString(16);
 		}
-		return id.replace(/@\d+$/,''); // no versioning (@) in the key
+		return id;//.replace(/@\d+$/,''); // no versioning (@) in the key
 	}
 	return '';
 }
@@ -32,14 +27,18 @@ export const getGlyph=(s:string|number)=>{
 	const m=gid.match(/^u([\da-f]{4,5})$/);
 	if (m) {
 		const cp=parseInt(m[1],16);
-		if (cp>=0x20000) {
+		if (cp>=0x20000 && cp<=0x40000) {
 			lbaseline=ext_starts+cp-0x20000 ;
 		} else if (cp>=0x3400 && cp<0x9FFF) {
 			lbaseline=bmp_starts+cp-0x3400  ;
+		} else if (cp>=0xa0000 && cp<=0xd4fff) {
+			lbaseline=ebag_starts+cp-0xa0000  ;
 		}
 	} else {
-		const at=bsearch(gidarr,gid);
-		if (gid==gidarr[at]) {
+		// const at=bsearch(gidarr,gid);
+		const at=gidarr.find(gid);
+
+		if (gid==gidarr.get(at)) {
 			lbaseline=gwcomp_starts+at;
 		} else {
 			return;
@@ -48,12 +47,14 @@ export const getGlyph=(s:string|number)=>{
 	if (typeof lbaseline=='undefined') return;
 
 	//assuming all read are loaded, recursive await is very slow
-	const gd=lbase.slice(lbaseline)[0];
+	if (!ptk) return '';
+	const gd=ptk.getLine(lbaseline);
 	
 	return unpackGD(gd);
 }
 let depth=0;
 export const loadComponents=(data,compObj,countrefer=false)=>{ //enumcomponents recursively
+	if (!data) return;
 	const entries=data.split('$');
 	depth++;
 	if (depth>10) {
@@ -64,7 +65,7 @@ export const loadComponents=(data,compObj,countrefer=false)=>{ //enumcomponents 
 		if (entries[i].slice(0,3)=='99:') {
 			let gid=entries[i].slice(entries[i].lastIndexOf(':')+1);
 			if (parseInt(gid).toString()==gid) { //部件碼後面帶數字
-				gid=(entries[i].split(':')[7]).replace(/@\d+$/,'');
+				gid=(entries[i].split(':')[7]);//.replace(/@\d+$/,'');
 			}
 			const d=getGlyph(gid);
 			if (!d) {
@@ -139,40 +140,15 @@ export const getLastComps=(value:string)=>{
 	if (!chars.length) return [];
 	return componentsOf(chars[chars.length-1]);
 }
-/*
-export const addFontData=(key:string,data:string)=>{
-	if (key=='gwcomp') gwcomp=new StringArray(data,'=');//component gid as key
-	else if (key=='cjkbmp') cjkbmp=new StringArray(data); // array index = codepoint - 0x3400
-	else if (key=='cjkext') cjkext=new StringArray(data); // array index = codepoint - 0x2000 
-	else throw "wrong font key";
-}
-*/
-//
-/*
-export const loadJsFont=(comp:string,bmp:string,ext:string)=>{
-	addFontData('gwcomp',comp);
-	addFontData('cjkbmp',bmp);
-	addFontData('cjkext',ext);
-  return {gwcomp,cjkbmp,cjkext};    // client should not access the StringArray directly
-}
-*/
-export const isFontReady=()=>!!lbase;
-export const loadFont=async (zip)=>{ //see hzpx/pack-glyphwiki.js
-	if (lbase) return lbase;	
-	console.time('loadfont')
-	lbase=new LineBase({name:"hzpx",zip});
-	await lbase.isReady();
-	gwcomp_starts=lbase.sectionRange('gwcomp')[0];
-	bmp_starts=lbase.sectionRange('bmp')[0];
-	let ends;//ends of glyphwiki data
-	[ext_starts,ends]=lbase.sectionRange('ext');
-	// await lbase.loadLines(lbase.sectionRange('gid')  );
-	await lbase.loadLines(0, ends); // recursive await is very slow 
+export const isFontReady=()=>!!ptk;
 
-	const packedstrings=lbase.slice(0,1)[0];
-	gidarr=unpackStrings(packedstrings);
-
-	//console.log(gwcomp_starts,bmp_starts,ext_starts);
-	console.timeEnd('loadfont')
-	return lbase;
+export const loadFont= async ()=>{
+	ptk=await openPtk('hzpx')
+	await ptk.loadAll(); // recursive await is very slow 
+	const [gid_starts]=ptk.sectionRange('gid');
+	gidarr=new StringArray(ptk.getLine(gid_starts), {sep:LEMMA_DELIMITER});
+	[bmp_starts]=ptk.sectionRange('bmp');
+	[ext_starts]=ptk.sectionRange('ext');
+	[ebag_starts]=ptk.sectionRange('ebag');
+	[gwcomp_starts]=ptk.sectionRange('gwcomp');
 }

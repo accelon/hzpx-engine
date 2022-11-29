@@ -1,4 +1,6 @@
 import {CJKRangeName,splitUTF32Char} from 'ptk/utils'
+export * from './src/fontface.ts'
+export * from './src/pinx.ts'
 const inRange=(s:string,cjkranges:string[] )=>{
 	const rangename=CJKRangeName(s);
 	return ~cjkranges.indexOf(rangename);
@@ -7,7 +9,7 @@ const replaceReg=/\07([^\07]+)\07/g
 
 export const extractPinx=(html,opts={}) =>{
 	const pair=opts.pair||'︻︼';
-	const cjk=opts.cjk||'ABCDEFG';
+	const cjk=opts.cjk||'ABCDEFGHZ';
 	const cjkranges=cjk.toUpperCase().split('').map(s=>'Ext'+s); //match the CJKRangeName
 
 	let out='', nreplace=0;
@@ -41,7 +43,7 @@ export const extractPinx=(html,opts={}) =>{
 }
 
 // this is a naive implementation, assuming ele has fix style
-export const inject=(ele:HTMLElement,opts={})=>{
+export const injectPinx=(ele:HTMLElement,opts={})=>{
 	if (!onOff) return;
 	const {color ,fontSize}=window.getComputedStyle(ele); 
 	const size=parseInt(fontSize)*1.1;
@@ -50,7 +52,7 @@ export const inject=(ele:HTMLElement,opts={})=>{
 }
 
 
-export const render=(ele:HTMLElement, text=''):void=>{
+export const renderPinx=(ele:HTMLElement, text=''):void=>{
 	if (!ele) return;
 	if (!onOff) return ele.innerText;
 	if (!text) text=ele.innerText;
@@ -75,9 +77,9 @@ export const ready=()=>{
 let onOff=true;
 export const renderSelector=(selector?:string='.hzpx')=>{
 	const eles=document.querySelectorAll(selector);
-	eles.forEach(ele=>Hzpx.inject(ele))
+	eles.forEach(ele=>Hzpx.injectPinx(ele))
 }
-export const Hzpx={ready,isFontReady, drawPinx,loadFont, inject, render,getLastComps};
+export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,getLastComps};
 
 if (typeof window!=='undefined' && !window.Hzpx) {
 	window.Hzpx=Hzpx;
@@ -93,5 +95,5 @@ if (typeof window!=='undefined') {
 }
 
 
-export {drawPinx, isFontReady,loadFont, getLastComps};
+export {drawPinx, isFontReady,loadFont, getLastComps, enumFontface};
 export default Hzpx;
