@@ -6,24 +6,30 @@
 const jsonp=true;    //create jsonp 
 const compress=false;  // zip with compression
 
-const {LineBase,Column,nodefs,readTextLines,writeChanged,alphabetically,alphabetically0,
-	splitUTF32,bsearch, packStrings,escapeTemplateString,fromObj,writePitaka}=require('ptk/nodebundle.cjs');
+import {LEMMA_DELIMITER,LineBaser,Column,nodefs,readTextLines,writeChanged,alphabetically,alphabetically0,
+	splitUTF32,bsearch, packStrings,escapeTemplateString,fromObj,writePitaka} from 'ptk/nodebundle.cjs';
 
 //run ptk/dev-cjs.cmd to get common js version of ptk
 
- const {prepareForNodejs,eachGlyphUnit,getGlyph_lexicon,setGlyph_lexicon,serializeGlyphUnit,
-	getGlyphWikiData ,gidIsCJK, packGD,packGID} = require("./nodebundle.js")
-
-const main=async ()=>{
+import hzpx from "./nodebundle.cjs"
+const {prepareForNodejs,eachGlyphUnit,getGlyph_lexicon,setGlyph_lexicon,serializeGlyphUnit,
+	getGlyphWikiData ,gidIsCJK, packGD,packGID} = hzpx;
 await nodefs;
 
-const JSZip= require("lazip");
+
+// const JSZip= require("lazip");
 
 console.log('compressing glyphwiki-dump.txt');
 const lines=readTextLines('glyphwiki-dump.txt');
 prepareForNodejs(lines);
 const es6=process.argv[2]=='es6';
 const split=false; //add split(/\r?\n/) add the end , old format
+
+setGlyph_lexicon('u200e0-jv','1:0:2:33:37:149:37$1:22:23:149:37:149:152$1:0:0:15:96:188:96$1:0:2:34:152:149:152$2:7:8:84:43:104:52:111:73$2:7:8:76:100:98:109:107:132');
+setGlyph_lexicon('u002e','');
+//hot fix for 寶,inorder to make 邏羅寶貝𩀨從䞃致招  look nice
+setGlyph_lexicon('u5bf6-j','99:0:0:0:0:200:200:u21a67-03:0:0:0$99:0:0:0:100:200:195:u8c9d:0:0:0');
+setGlyph_lexicon('u5348@1','99:0:0:0:0:200:200:u5348-j') ;//結尾有$ 是錯的
 
 
 const compFreq={};//
@@ -119,28 +125,23 @@ for (let i=0;i<gw.length;i++) {
 	}
 }
 
-//console.log(cjkbmp.length,cjkext.length , gwcomp.length)
 const createPitaka=async ()=>{
-		//break gwcomp to and 
-	    gwcomp.sort(alphabetically0)
-	    const column=new Column();
-	    column.fromTSV(gwcomp);
-	    const lbase=new LineBase();
-		const keys=packStrings(column.keys) ;
-		lbase.append( keys , 'gid', 'strings');
-		lbase.append( column.values[0] , 'gwcomp');
-		lbase.append( cjkbmp,'bmp');
-		lbase.append( cjkext,'ext');
-
-		//compress 1.9MB , 150ms more load time
-		await writePitaka(lbase,{name:"hzpx" , jsonp, JSZip, compress});
+	const lbase=new LineBaser();	
+	const keys=gwcomp.map(it=>it[0]).join(LEMMA_DELIMITER);
+	const values=gwcomp.map(it=>it[1]).join('\n');
+	lbase.append( keys , {name:'gid'});
+	lbase.append( values , {name:'gwcomp'});
+	lbase.append( cjkbmp,{name:'bmp'});
+	lbase.append( cjkext,{name:'ext'});
+	// lbase.append( cjkebag,{name:'ebag'});
+	const jsonp=true;
+	//compress 1.9MB , 150ms more load time
+	await writePitaka(lbase,{name:"hzpx" , jsonp, compress:false});
 }
 createPitaka();
-};
 
 
-main();
-
+/*
 const writePureJS=()=>{
 	const wrapmod=(name,content)=>(es6?`export const ${name} =\``:`Hzpx.addFontData('${name.toLowerCase()}',\``)
 		+escapeTemplateString(content.join('\n'))+(split?'`.split(/\\r?\\n/)':'') + (es6?'`':'`)');
@@ -159,3 +160,4 @@ const writePureJS=()=>{
 	}
 }
 
+*/

@@ -46,6 +46,8 @@ export const setGlyph_lexicon=(s,data)=>{ //replace the glyph data
 	if (at>0) {
 		let from=gw[at].indexOf('=');
 		gw[at]=gw[at].slice(0,from+1)+data;
+	} else {
+		console.log('cannot set glyph',s)
 	}
 }
 export const getGlyph_lexicon=(s,lexicon=gw)=>{

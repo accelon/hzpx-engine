@@ -66,7 +66,9 @@ export const  drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 	setKageOption(opts,pxe);
 	
 	pxe.makeGlyph(polygons, gid);
+	if (opts.polygon) return polygons.array.map(it=>it._array);
 	let svg=polygons.generateSVG(true);
+	
 	svg = opts.frame?addFrameToSVG(d,svg):svg;
 	svg = patchSVG(svg, 'style="padding-top:0.2em" gid='+gid+ ' title='+unicode);
 	if (color!=='black' && color) svg = patchColor(svg, color);
@@ -113,6 +115,7 @@ export const drawPinxChar=(ire,opts: DrawGlyphOptions={})=>{
 	pxe.kBuhin.push(ire,d);
 	setKageOption(opts,pxe)
 	pxe.makeGlyph(polygons, ire);
+	if (opts.polygon) return polygons.array.map(it=>it._array);
 	let svg=polygons.generateSVG(true);
 	appends.forEach(append=>svg=appendToSVG(append,svg));
 	svg = opts.frame?addFrameToSVG(d,svg):svg;
