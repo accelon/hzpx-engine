@@ -1,5 +1,5 @@
-import {getGlyph,loadComponents,componentsOf, ch2gid, gid2ch,factorsOfGD} from './gwfont.js'
-import {splitUTF32Char,codePointLength,alphabetically,intersect} from "ptk/utils"
+import {getGlyph,componentsOf, factorsOfGD} from './gwfont.ts'
+import {splitUTF32Char,codePointLength,intersect} from "./ptkutils.ts"
 
 export const autoPinx=(ch,base)=>{
 	if (ch==base || !base) return ''
@@ -15,7 +15,7 @@ export const autoPinx=(ch,base)=>{
 	}
 	return ''
 }
-export const splitPinx=(str:string, tryAutoIRE=false)=>{
+export const splitPinx=(str, tryAutoIRE=false)=>{
 	const out=[];
 	const chars=splitUTF32Char(str);
 	let i=0;
@@ -49,4 +49,4 @@ export const splitPinx=(str:string, tryAutoIRE=false)=>{
 	ire&&out.push(ire)
 	return out;
 }
-export const validIRE=(ire:string):boolean=>codePointLength(ire)>1 && (splitPinx(ire)).length==1;
+export const validIRE=(iretring)=>codePointLength(ire)>1 && (splitPinx(ire)).length==1;

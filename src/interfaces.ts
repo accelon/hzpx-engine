@@ -8,12 +8,12 @@
 }
 
 export interface FontFace {
-
-	kMinWidthY?:number;
-	kMinWidthU?:number;
-	kMinWidthT?:number;
-	kWidth?:number;
-	kShotai?:number;
+  hei:boolean;
+	kMinWidthY:number;
+	kMinWidthU:number;
+	kMinWidthT:number;
+	kWidth:number;
+	kShotai:number;
 }
 
 export interface FontFaceMap {

@@ -1,7 +1,7 @@
-import {CJKRangeName,splitUTF32Char} from 'ptk/utils'
+import {LEMMA_DELIMITER,StringArray,openPtk,CJKRangeName,splitUTF32Char} from 'ptk'
 export * from './src/fontface.ts'
 export * from './src/pinx.ts'
-const inRange=(s:string,cjkranges:string[] )=>{
+const inRange=(s,cjkranges )=>{
 	const rangename=CJKRangeName(s);
 	return ~cjkranges.indexOf(rangename);
 }
@@ -15,7 +15,7 @@ export const extractPinx=(html,opts={}) =>{
 	let out='', nreplace=0;
 	const Pinx=[];  // keep the parameters for drawPinx, array index is \07idx\07 svg insert point
 
-	const getReplaceId=(s:string):number=>{
+	const getReplaceId=(s)=>{
 		const at=Pinx.indexOf(s);
 		if (at==-1) {
 			Pinx.push(s);
@@ -43,7 +43,7 @@ export const extractPinx=(html,opts={}) =>{
 }
 
 // this is a naive implementation, assuming ele has fix style
-export const injectPinx=(ele:HTMLElement,opts={})=>{
+export const injectPinx=(ele,opts={})=>{
 	if (!onOff) return;
 	const {color ,fontSize}=window.getComputedStyle(ele); 
 	const size=parseInt(fontSize)*1.1;
@@ -52,7 +52,7 @@ export const injectPinx=(ele:HTMLElement,opts={})=>{
 }
 
 
-export const renderPinx=(ele:HTMLElement, text=''):void=>{
+export const renderPinx=(ele, text='')=>{
 	if (!ele) return;
 	if (!onOff) return ele.innerText;
 	if (!text) text=ele.innerText;
@@ -62,7 +62,20 @@ export const renderPinx=(ele:HTMLElement, text=''):void=>{
 	return ele.innerText;
 }
 
-import {loadFont,isFontReady,getLastComps} from './src/gwfont.ts'
+import {isFontReady,getLastComps, setFontPtk} from './src/gwfont.ts'
+export const loadFont= async ()=>{
+	const ptk=await openPtk('hzpx')
+	await ptk.loadAll(); // recursive await is very slow 
+	const [gid_starts]=ptk.sectionRange('gid');
+	const gidarr=new StringArray(ptk.getLine(gid_starts), {sep:LEMMA_DELIMITER});
+	const [bmp_starts]=ptk.sectionRange('bmp');
+	const [ext_starts]=ptk.sectionRange('ext');
+	const [gwcomp_starts]=ptk.sectionRange('gwcomp');	
+	//const [ebag_starts]=ptk.sectionRange('ebag');
+	setFontPtk(gidarr,gwcomp_starts[0],bmp_starts[0],ext_starts[0])
+}
+
+
 import {drawPinx} from './src/drawglyph.ts'
 export const ready=()=>{
 	return new Promise(resolve=>{
@@ -75,7 +88,7 @@ export const ready=()=>{
 	});
 }
 let onOff=true;
-export const renderSelector=(selector?:string='.hzpx')=>{
+export const renderSelector=(selector='.hzpx')=>{
 	const eles=document.querySelectorAll(selector);
 	eles.forEach(ele=>Hzpx.injectPinx(ele))
 }
@@ -95,5 +108,5 @@ if (typeof window!=='undefined') {
 }
 
 
-export {drawPinx, isFontReady,loadFont, getLastComps, enumFontface};
+export {drawPinx, isFontReady,loadFont, getLastComps};
 export default Hzpx;

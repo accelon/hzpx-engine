@@ -6,6 +6,13 @@ hzpx backend in Typescript
 - [prebuild glyphwiki font](https://github.com/accelon/hzpx/) 
 - put hzpx/.js or hzpx.ptk in dist
 - put cjkbmp.mjs cjkext.mjs gwcomp.mjs in extension
+- put accelon/kage-engine/dist/kage.mjs in src
+
+## index.cjs
+
+create index.cjs for hzpxserver (commmon js )
+    rollup -c
+
 
 run esbuild background watch to test offline application
 

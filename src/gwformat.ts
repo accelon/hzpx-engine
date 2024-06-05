@@ -1,4 +1,4 @@
-import {bsearch,codePointLength} from 'ptk'
+import {bsearch} from './ptkutils.ts'
 let gw= typeof window!=='undefined' && window.BMP;
 let _cjkbmp= typeof window!=='undefined' && window.CJKBMP;
 let _cjkext= typeof window!=='undefined' && window.CJKEXT;

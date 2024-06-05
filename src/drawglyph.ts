@@ -1,19 +1,19 @@
 ﻿import {frameOf,getGlyph,ch2gid,loadComponents} from './gwfont.ts'
-import {getFontFace,enumFontFace } from './fontface.ts'
-import {Kage} from 'kage-engine'
-import {splitUTF32,codePointLength} from 'ptk/utils'
+import {getFontFace } from './fontface.ts'
+import {splitUTF32,codePointLength} from './ptkutils.ts'
 import {splitPinx,validIRE} from './pinx.ts'
-import {DrawGlyphOptions} from './interfaces.ts';
+import Kage from './kage.mjs' ;//copy from  yapcheahshen/kage-engine/dist/kage.mjs
+
 
 let pxe = new Kage();
 pxe.kUseCurve=true;
 let renderedComponents=[];
 
-const resizeSVG=(svg:string,size=64)=>svg.replace(/(width|height)=\"\d+\"/g,(m,m1,m2)=>m1+'='+size);
-const patchSVG=(svg:string,patch:string)=>svg.replace(/<svg /,'<svg '+patch+' ');
-const patchColor=(svg:string,color:string)=>svg.replace(/fill="black"/g,'fill="'+color+'"');
+const resizeSVG=(svg,size=64)=>svg.replace(/(width|height)=\"\d+\"/g,(m,m1,m2)=>m1+'='+size);
+const patchSVG=(svg,patch)=>svg.replace(/<svg /,'<svg '+patch+' ');
+const patchColor=(svg,color)=>svg.replace(/fill="black"/g,'fill="'+color+'"');
 
-const setKageOption=(opts:DrawGlyphOptions,engine:Kage)=>{
+const setKageOption=(opts,engine)=>{
 	engine=engine||pxe;
 	const fontface=getFontFace(opts.fontface||'');
 	if (fontface) {
@@ -24,7 +24,7 @@ const setKageOption=(opts:DrawGlyphOptions,engine:Kage)=>{
 		engine.kFont.kWidth=opts.width||5;		
 	}
 }
-const addFrameToSVG=(gd:string,svg:string)=>{
+const addFrameToSVG=(gd,svg)=>{
 	const frames=frameOf(gd); 
 	let framesvg='';
 	for (let i=0;i<frames.length;i++) {
@@ -36,7 +36,7 @@ const addFrameToSVG=(gd:string,svg:string)=>{
 	}
 	return appendToSVG(framesvg,svg);
 }
-export const  drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
+export const  drawGlyph=(unicode , opts={})=>{
 	if (!unicode) return '';
 	const components={};
 	const size=opts.size||64;
@@ -74,7 +74,7 @@ export const  drawGlyph=(unicode: string , opts: DrawGlyphOptions={})=>{
 	if (color!=='black' && color) svg = patchColor(svg, color);
 	return resizeSVG( svg,size);
 }
-export const drawPinxChar=(ire,opts: DrawGlyphOptions={})=>{
+export const drawPinxChar=(ire,opts={})=>{
 	const chars=splitUTF32(ire);
 
 	if (!(validIRE(ire))) return drawGlyphs(ire);
@@ -124,7 +124,7 @@ export const drawPinxChar=(ire,opts: DrawGlyphOptions={})=>{
 	svg = resizeSVG(svg,size);
 	return svg;
 }
-export const drawPinx=(str:string,opts: DrawGlyphOptions={})=>{
+export const drawPinx=(str,opts={})=>{
 	pxe = new Kage();
 	pxe.kUseCurve = true;
 	renderedComponents=[];

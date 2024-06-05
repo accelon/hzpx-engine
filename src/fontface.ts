@@ -1,13 +1,13 @@
-﻿import {FontFace,FontFaceMap } from './interfaces.ts';
+﻿//import {FontFace,FontFaceMap } from './interfaces.ts';
 
 
-const fontfacedef:FontFaceMap={};
+const fontfacedef={};
 
-export const addFontFace=(name:string,settings:FontFace)=>{
+export const addFontFace=(name,settings)=>{
 	fontfacedef[name]=settings;
 }
 
-export const getFontFace=(name:string)=>{
+export const getFontFace=(name)=>{
 	return fontfacedef[name];
 }
 export const enumFontFace=()=>{

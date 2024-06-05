@@ -1,6 +1,6 @@
 /* compression of glyphwiki format */
 
-import {splitUTF32Char,SEPARATOR2D,packInt,unpackInt,pack1,unpack1} from 'ptk/utils' //~ serve as comp seperator
+import {splitUTF32Char,SEPARATOR2D,packInt,unpackInt,pack1,unpack1} from './ptkutils.ts' //~ serve as comp seperator
 
 //stroke
 // const gd2='2:7:8:86:92:100:97:110:111$1:0:0:17:115:185:115$2:32:7:100:115:71:140:12:163$1:32:0:58:144:58:180$2:0:7:53:184:75:174:107:159$2:0:7:165:127:148:138:114:156$2:7:0:129:148:154:172:179:180'
@@ -12,7 +12,7 @@ import {splitUTF32Char,SEPARATOR2D,packInt,unpackInt,pack1,unpack1} from 'ptk/ut
 
 const NUMOFFSET=10;//must more than stroke type
 const NEGATIVE=4000;//some stroke deco 
-export const unpackGD=(str:string)=>{
+export const unpackGD=(str)=>{
 	if (!str) return '';
 	const units=str.split(SEPARATOR2D);
 	const arr=[];
@@ -40,17 +40,17 @@ export const unpackGD=(str:string)=>{
 }
 
 /* rare numbers -156,1  -107,1          1000,6 2005,3 2032,1 3000,2 3012,1 3022,1*/
-const N=(n:number)=>{
+const N=(n)=>{
 	if (n<0) n= NEGATIVE + (-n);
 	else n+=NUMOFFSET;
 	return n;
 }
-const UN=(n:number)=>{
+const UN=(n)=>{
 	if (n>NEGATIVE) return -n+NEGATIVE;
 	else n-=NUMOFFSET;
 	return n;
 }
-export const packGID=(gid:string)=>{
+export const packGID=(gid)=>{
 	const m=gid.match(/^u([\da-f]{4,5})/);
 	if (m) {
 		const suffix=gid.slice(m[1].length+1);
@@ -61,7 +61,7 @@ export const packGID=(gid:string)=>{
 	}
 	return gid;
 }
-export const unpackGID=(gid:string)=>{
+export const unpackGID=(gid)=>{
 	const cp=gid.codePointAt(0)||0;
 	let s='';
 	if (cp>0xff) {
@@ -73,7 +73,7 @@ export const unpackGID=(gid:string)=>{
 	}
 	return s;
 }
-export const packGD=(str:string)=>{
+export const packGD=(str)=>{
 	const units=str.split('$');
 	let s='';
 	for (let i=0;i<units.length;i++) {
