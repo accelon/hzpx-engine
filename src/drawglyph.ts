@@ -9,7 +9,7 @@ let pxe = new Kage();
 pxe.kUseCurve=true;
 let renderedComponents=[];
 
-const resizeSVG=(svg,size=64)=>svg.replace(/(width|height)=\"\d+\"/g,(m,m1,m2)=>m1+'='+size);
+const resizeSVG=(svg,size=64)=>svg.replace(/(width|height)=\"\d+\"/g,(m,m1,m2)=>m1+'="'+size+'"');
 const patchSVG=(svg,patch)=>svg.replace(/<svg /,'<svg '+patch+' ');
 const patchColor=(svg,color)=>svg.replace(/fill="black"/g,'fill="'+color+'"');
 
@@ -39,7 +39,7 @@ const addFrameToSVG=(gd,svg)=>{
 export const  drawGlyph=(unicode , opts={})=>{
 	if (!unicode) return '';
 	const components={};
-	const size=opts.size||64;
+	const size=opts.size||128;
 	const alt=opts.alt||false;
 	const color=opts.color||'black';
 	const frame=opts.frame||false;
@@ -52,7 +52,6 @@ export const  drawGlyph=(unicode , opts={})=>{
 	} else {
 		gid='u'+unicode.codePointAt(0).toString(16);
 	}
-
 	const d=getGlyph(gid);
 
 	if (!d) return unicode;
@@ -70,7 +69,7 @@ export const  drawGlyph=(unicode , opts={})=>{
 	let svg=polygons.generateSVG(true);
 	
 	svg = opts.frame?addFrameToSVG(d,svg):svg;
-	svg = patchSVG(svg, 'style="padding-top:0.2em" gid='+gid+ ' title='+unicode);
+	svg = patchSVG(svg, 'style="padding-top:0.2em" gid="'+gid+ '" title="'+unicode+'"');
 	if (color!=='black' && color) svg = patchColor(svg, color);
 	return resizeSVG( svg,size);
 }
@@ -79,7 +78,7 @@ export const drawPinxChar=(ire,opts={})=>{
 
 	if (!(validIRE(ire))) return drawGlyphs(ire);
 	let i=0,polygons = new Kage.Polygons();
-	const size=opts.size||64;
+	const size=opts.size||128;
 	let appends=[];
 	while (i<chars.length-2) {
 		const components={};	
@@ -119,7 +118,7 @@ export const drawPinxChar=(ire,opts={})=>{
 	let svg=polygons.generateSVG(true);
 	appends.forEach(append=>svg=appendToSVG(append,svg));
 	svg = opts.frame?addFrameToSVG(d,svg):svg;
-	svg = patchSVG(svg, 'style="padding-top:0.2em" title='+ire);
+	svg = patchSVG(svg, 'style="padding-top:0.2em" title="'+ire+'"');
 	if (opts.color!=='black' && opts.color) svg = patchColor(svg, opts.color);
 	svg = resizeSVG(svg,size);
 	return svg;

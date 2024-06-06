@@ -49,4 +49,4 @@ export const splitPinx=(str, tryAutoIRE=false)=>{
 	ire&&out.push(ire)
 	return out;
 }
-export const validIRE=(iretring)=>codePointLength(ire)>1 && (splitPinx(ire)).length==1;
+export const validIRE=(ire)=>codePointLength(ire)>1 && (splitPinx(ire)).length==1;

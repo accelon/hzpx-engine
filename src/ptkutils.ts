@@ -240,3 +240,18 @@ export const bsearchNumber = (arr, obj) =>{
 }
   
 export const alphabetically0 = (a, b) => a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0;  
+
+
+export const loadRawText=(raw)=>{
+	//3 times faster than readFileSync with encoding
+	//buffer is hold in C++ object instead of node.js heap
+	const dv=new DataView(raw.buffer);
+	const encoding=dv.getUint16(0)==0xfffe?'utf-16le':'utf-8'; //only support utf16 le and utf8
+	const decoder=new TextDecoder(encoding);
+	let s=decoder.decode(raw); 
+	if (s.charCodeAt(0)===0xfeff) s=s.slice(1); //BOM is okay, no memory write involved
+
+	// DOS style crlf get 300% memory consumption penalty 
+	if (s.indexOf('\r')>-1) s=s.replace(/\r?\n/g,'\n');
+	return s.split('\n');
+}

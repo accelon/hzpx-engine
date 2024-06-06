@@ -1,4 +1,4 @@
-﻿import {bsearchNumber, codePointLength,splitUTF32Char,alphabetically0} from './ptkutils.ts'
+﻿import {bsearchNumber,bsearch, codePointLength,splitUTF32Char,alphabetically0,loadRawText} from './ptkutils.ts'
 import {unpackGD} from './gwpacker.ts';
 let ptk ;
 let gidarr; // bsearchable gid off components
@@ -7,7 +7,7 @@ let ptkfont=false;
 let cjkbmp,cjkext;
 
 let gwunicode=[], gwbody=[];  //部件 內碼及本體，排序過
-
+let rawlines;
 
 export const setFontPtk=(g,gw,b,e,ebag)=>{
 	gidarr=g;
@@ -16,6 +16,23 @@ export const setFontPtk=(g,gw,b,e,ebag)=>{
 	gwcomp_starts=gw;
 	ebag_starts=ebag;
 	ptkfont=true;
+}
+export const setFontTSV=(raw)=>{
+	rawlines=loadRawText(raw);
+	const comps=[];
+	for (let i=0;i<rawlines.length;i++) {
+		const line=rawlines[i];
+		const at=line.indexOf('\t');
+		const unicode=line.slice(0,at);
+		const body=line.slice(at+1);
+		comps.push([unicode, body])
+	}
+	comps.sort(alphabetically0);
+	for (let i=0;i<comps.length;i++) {
+		gwunicode.push(comps[i][0]);
+		gwbody.push(comps[i][1])
+	}
+
 }
 export const setFontJs=(gw,bmp,ext)=>{
 	cjkbmp=bmp;  //start from U+3400
@@ -45,7 +62,7 @@ export const getGID=(id)=>{ //replace versioning , allow code point or unicode c
 	}
 	return '';
 }
-export const ch2gid=(ch)=>'u'+(typeof ch=='number'?ch:(ch?.codePointAt(0)||' ')).toString(16);
+export const ch2gid=(ch)=>'u'+(typeof ch=='number'?ch:(ch.codePointAt(0)||' ')).toString(16);
 const getGlyphPtk=(s)=>{
 	if (typeof s=='number') s=String.fromCodePoint(s)
 	if (!s||( typeof s=='string' && (s.codePointAt(0)||0)>0xff && codePointLength(s)>1)) {
@@ -82,10 +99,18 @@ const getGlyphPtk=(s)=>{
 	return unpackGD(gd);
 }
 export const getGlyph=s=>{
-	if (ptkfont) return getGlyphPtk(s);
-	const gid=getGID(s);
-	const m=gid.match(/^u([\da-f]{4,5})$/);
 	let data='';
+	const gid=getGID(s);
+	if (rawlines) {
+		const at= bsearch(gwunicode,gid);
+		if (at>0) {
+			data=gwbody[at]
+		}
+		return data;
+	}
+	if (ptkfont) return getGlyphPtk(s);
+
+	const m=gid.match(/^u([\da-f]{4,5})$/);
 	if (m) {
 		const cp=parseInt(m[1],16);
 		if (cp>=0x20000 && cp<=0x40000) {
@@ -94,7 +119,7 @@ export const getGlyph=s=>{
             data=cjkbmp[cp-0x3400];
         }
     } else {
-		const at= bsearchNumber(gidarr,gid);
+		const at= bsearchNumber(gwunicode,gid);
 		if (~at) {
 			data=gwbody[at];
 		}
@@ -192,4 +217,5 @@ export const getLastComps=(value)=>{
 	return componentsOf(chars[chars.length-1]);
 }
 export const isFontReady=()=>!!ptk;
+
 
