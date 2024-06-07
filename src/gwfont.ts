@@ -1,15 +1,37 @@
 ﻿import {bsearchNumber,bsearch, codePointLength,splitUTF32Char,alphabetically0,loadRawText} from './ptkutils.ts'
 import {unpackGD} from './gwpacker.ts';
+
 let ptk ;
-let gidarr; // bsearchable gid off components
+let gidarr=[]; // bsearchable gid off components, all parts including bmp,ext
 let bmp_starts,ext_starts,gwcomp_starts,ebag_starts;
 let ptkfont=false;
 let cjkbmp,cjkext;
 
-let gwunicode=[], gwbody=[];  //部件 內碼及本體，排序過
+let gwgid=[]; // 從 gwcomp 拆出的 gid , 不含bmp,ext
+let gwbody=[];  //  組字指令，可能全部(從glyphwiki-dump.txt 載入時)，或不含bmp/ext (從browser 載入時)
 let rawlines;
 
-export const setFontPtk=(g,gw,b,e,ebag)=>{
+export const addFontData=(name,data)=>{ //call by pure js data cjkbmp.js 
+	if (name=='cjkbmp') cjkbmp=data.split(/\r?\n/);
+	else if (name=='cjkext') cjkext=data.split(/\r?\n/);
+	else if (name=='gwcomp') {
+		const comps=[];
+		const lines=data.split(/\r?\n/);
+		for (let i=0;i<lines.length;i++) {
+			const line=lines[i]
+			const at=line.indexOf(',');
+			comps.push([line.slice(0,at),line.slice(at+1)]);
+		}
+		comps.sort(alphabetically0);
+		for (let i=0;i<comps.length;i++) {
+			gwgid.push(comps[i][0]);
+			gwbody.push(comps[i][1]);
+		}
+	}
+}
+
+export const setFontPtk=(_ptk,g,gw,b,e,ebag)=>{
+	ptk=_ptk
 	gidarr=g;
 	bmp_starts=b;
 	ext_starts=e;
@@ -29,7 +51,7 @@ export const setFontTSV=(raw)=>{
 	}
 	comps.sort(alphabetically0);
 	for (let i=0;i<comps.length;i++) {
-		gwunicode.push(comps[i][0]);
+		gidarr.push(comps[i][0]);
 		gwbody.push(comps[i][1])
 	}
 
@@ -47,7 +69,7 @@ export const setFontJs=(gw,bmp,ext)=>{
 	}
 	comps.sort(alphabetically0);
 	for (let i=0;i<comps.length;i++) {
-		gwunicode.push(comps[i][0]);
+		gwgid.push(comps[i][0]);
 		gwbody.push(comps[i][1])
 	}
 }
@@ -102,8 +124,8 @@ export const getGlyph=s=>{
 	let data='';
 	const gid=getGID(s);
 	if (rawlines) {
-		const at= bsearch(gwunicode,gid);
-		if (at>0) {
+		const at= bsearch(gidarr,gid);
+		if (at>0 && gidarr[at].startsWith(gid)) { //make sure same base codepoint otherwise cannot match u21a67-03
 			data=gwbody[at]
 		}
 		return data;
@@ -119,7 +141,7 @@ export const getGlyph=s=>{
             data=cjkbmp[cp-0x3400];
         }
     } else {
-		const at= bsearchNumber(gwunicode,gid);
+		const at= bsearch(gwgid,gid);
 		if (~at) {
 			data=gwbody[at];
 		}
@@ -138,10 +160,12 @@ export const loadComponents=(data,compObj,countrefer=false)=>{ //enumcomponents 
 		return;
 	}
 	for (let i=0;i<entries.length;i++) {
-		if (entries[i].slice(0,3)=='99:') {
-			let gid=entries[i].slice(entries[i].lastIndexOf(':')+1);
-			if (parseInt(gid).toString()==gid) { //部件碼後面帶數字
-				gid=(entries[i].split(':')[7]);//.replace(/@\d+$/,'');
+		const units=entries[i].split(':');
+		if (units[0]=='99') {
+			let gid=units[7];
+			if (gid=='undefined') {
+				console.log('wrong gid')
+				break;
 			}
 			const d=getGlyph(gid);
 			if (!d) {

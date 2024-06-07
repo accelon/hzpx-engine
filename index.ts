@@ -1,4 +1,4 @@
-import {LEMMA_DELIMITER,StringArray,openPtk,CJKRangeName,splitUTF32Char} from 'ptk'
+import {LEMMA_DELIMITER,StringArray,openPtk,CJKRangeName,splitUTF32Char} from 'ptk/nodebundle.cjs'
 export * from './src/fontface.ts'
 export * from './src/pinx.ts'
 const inRange=(s,cjkranges )=>{
@@ -62,8 +62,12 @@ export const renderPinx=(ele, text='')=>{
 	return ele.innerText;
 }
 
-import {isFontReady,getLastComps, setFontPtk} from './src/gwfont.ts'
-export const loadFont= async ()=>{
+import {isFontReady,getLastComps, setFontPtk,gid2ch,getGlyph,addFontData} from './src/gwfont.ts'
+
+export const loadFont=()=>{
+	setFont(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
+}
+export const loadPtkFont= async ()=>{
 	const ptk=await openPtk('hzpx')
 	await ptk.loadAll(); // recursive await is very slow 
 	const [gid_starts]=ptk.sectionRange('gid');
@@ -72,11 +76,10 @@ export const loadFont= async ()=>{
 	const [ext_starts]=ptk.sectionRange('ext');
 	const [gwcomp_starts]=ptk.sectionRange('gwcomp');	
 	//const [ebag_starts]=ptk.sectionRange('ebag');
-	setFontPtk(gidarr,gwcomp_starts[0],bmp_starts[0],ext_starts[0])
+	setFontPtk(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
 }
 
-
-import {drawPinx} from './src/drawglyph.ts'
+import {drawPinx,drawGlyph} from './src/drawglyph.ts'
 export const ready=()=>{
 	return new Promise(resolve=>{
 		let timer1=setInterval(()=>{
@@ -92,7 +95,7 @@ export const renderSelector=(selector='.hzpx')=>{
 	const eles=document.querySelectorAll(selector);
 	eles.forEach(ele=>Hzpx.injectPinx(ele))
 }
-export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,getLastComps};
+export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,getLastComps,addFontData};
 
 if (typeof window!=='undefined' && !window.Hzpx) {
 	window.Hzpx=Hzpx;
@@ -107,6 +110,5 @@ if (typeof window!=='undefined') {
 	},1);	
 }
 
-
-export {drawPinx, isFontReady,loadFont, getLastComps};
+export {drawPinx, isFontReady, getLastComps, gid2ch, drawGlyph,getGlyph};
 export default Hzpx;

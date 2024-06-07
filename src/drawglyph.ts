@@ -76,7 +76,7 @@ export const  drawGlyph=(unicode , opts={})=>{
 export const drawPinxChar=(ire,opts={})=>{
 	const chars=splitUTF32(ire);
 
-	if (!(validIRE(ire))) return drawGlyphs(ire);
+	if (!(validIRE(ire))) return drawGlyph(ire);
 	let i=0,polygons = new Kage.Polygons();
 	const size=opts.size||128;
 	let appends=[];
@@ -97,8 +97,9 @@ export const drawPinxChar=(ire,opts={})=>{
 		// }
 		for (let c in components) {
 			if (c.slice(0,from.length)==from) { 
-				let repl=getGlyph(to+c.slice(from.length));//same variant
-				if (!repl) repl=getGlyph(to); 
+				
+				let repl=getGlyph(to+c.slice(from.length)) //same variant
+				if (!repl) repl=getGlyph(to);
 				pxe.kBuhin.push(c, repl ) ; //替換，但框不變，  	
 				const comps={};
 				loadComponents(repl,comps);

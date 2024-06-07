@@ -10,7 +10,7 @@ hzpx backend in Typescript
 
 ## index.cjs
 
-create index.cjs for hzpxserver (commmon js )
+create node.cjs for hzpxserver (commmon js )
     rollup -c
 
 

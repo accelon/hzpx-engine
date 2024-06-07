@@ -5,12 +5,12 @@ export default {
 	input: "node.ts",
 	output: [
 		{
-			file: "index.cjs",
+			file: "hzpxnode.cjs",
 			format: "cjs",
 			name: "named",
 			exports: "named",
 		}
-	]
+	],
 	//plugins:[resolve()]
 	//plugins: [typescript({ tsconfig: false, target: "es5" })],
 };
