@@ -142,11 +142,14 @@ export const getGlyph=s=>{
         }
     } else {
 		const at= bsearch(gwgid,gid);
-		if (~at) {
+		if (~at && gid.startsWith(gwgid[at])) {
 			data=gwbody[at];
+			
 		}
     }
-	return unpackGD(data)
+	const r=unpackGD(data);
+	console.log(gid,r)
+	return r
 };
 
 
