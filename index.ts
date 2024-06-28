@@ -12,7 +12,6 @@ export const extractPinx=(html,opts={}) =>{
 	const cjk=opts.cjk||'ABCDEFGHZ';
 	const cjkranges=cjk.toUpperCase().split('').map(s=>'Ext'+s); //match the CJKRangeName
 
-	let out='', nreplace=0;
 	const Pinx=[];  // keep the parameters for drawPinx, array index is \07idx\07 svg insert point
 
 	const getReplaceId=(s)=>{
@@ -62,7 +61,7 @@ export const renderPinx=(ele, text='')=>{
 	return ele.innerText;
 }
 
-import {isFontReady,getLastComps, setFontPtk,gid2ch,getGlyph,addFontData} from './src/gwfont.ts'
+import {isFontReady,getLastComps, setFontPtk,gid2ch,getGlyph,addFontData,isDataReady} from './src/gwfont.ts'
 
 export const loadFont=()=>{
 	setFont(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
@@ -99,7 +98,6 @@ export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,
 
 if (typeof window!=='undefined' && !window.Hzpx) {
 	window.Hzpx=Hzpx;
-
 }
 if (typeof window!=='undefined') {
 	setTimeout(async ()=>{
@@ -110,5 +108,5 @@ if (typeof window!=='undefined') {
 	},1);	
 }
 
-export {drawPinx, isFontReady, getLastComps, gid2ch, drawGlyph,getGlyph};
+export {drawPinx, isFontReady, getLastComps, gid2ch, drawGlyph,getGlyph,isDataReady};
 export default Hzpx;

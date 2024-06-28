@@ -244,5 +244,10 @@ export const getLastComps=(value)=>{
 	return componentsOf(chars[chars.length-1]);
 }
 export const isFontReady=()=>!!ptk;
+export const isDataReady=()=>{
+	const ready= cjkbmp && cjkbmp.length && cjkext && cjkext.length && gwbody && gwbody.length;
+	console.log('ready',ready)
+	return ready;
+}
 
 
