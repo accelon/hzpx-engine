@@ -2,8 +2,8 @@ import {splitUTF32Char} from 'ptk/utils/unicode.ts'
 import {CJKRangeName} from 'ptk/utils/cjk.ts'
 
 
-export * from './fontface.ts'
-export * from './pinx.ts'
+export * from './src/fontface.ts'
+export * from './src/pinx.ts'
 
 const inRange=(s,cjkranges )=>{
 	const rangename=CJKRangeName(s);
@@ -65,13 +65,13 @@ export const renderPinx=(ele, text='')=>{
 	return ele.innerText;
 }
 
-import {isFontReady,getLastComps, gid2ch,getGlyph,addFontData,isDataReady} from './gwfont.ts'
+import {isFontReady,getLastComps, gid2ch,getGlyph,addFontData,isDataReady} from './src/gwfont.ts'
 
 export const loadFont=()=>{
 	setFont(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
 }
 
-import {drawPinx,drawGlyph} from './drawglyph.ts'
+import {drawPinx,drawGlyph} from './src/drawglyph.ts'
 export const ready=()=>{
 	return new Promise(resolve=>{
 		let timer1=setInterval(()=>{

@@ -8,11 +8,16 @@ hzpx backend in Typescript
 - put cjkbmp.mjs cjkext.mjs gwcomp.mjs in extension
 - put accelon/kage-engine/dist/kage.mjs in src
 
+## with svelte
+
+import from hzpx-engine/src/web.ts
+
 ## index.cjs
+
+
 
 create node.cjs for hzpxserver (commmon js )
     rollup -c
-
 
 run esbuild background watch to test offline application
 

@@ -1,6 +1,6 @@
-import {openPtk} from 'ptk/nodebundle.cjs'
+import {openPtk} from 'ptk/basket/openptk.ts'
 import {LEMMA_DELIMITER,StringArray} from 'ptk/utils/stringarray.ts'
-export * from'./src/web.ts'
+export * from'./web.ts'
 import { setFontPtk } from './src/gwfont.ts'
 export const loadPtkFont= async ()=>{
 	const ptk=await openPtk('hzpx')

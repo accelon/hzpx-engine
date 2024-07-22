@@ -329,7 +329,6 @@ const getGlyph=s=>{
 		}
     }
 	const r=unpackGD(data);
-	console.log(gid,r);
 	return r
 };
 
@@ -425,6 +424,11 @@ const getLastComps=(value)=>{
 	return componentsOf(chars[chars.length-1]);
 };
 const isFontReady=()=>!!ptk;
+const isDataReady=()=>{
+	const ready= cjkbmp && cjkbmp.length && cjkext && cjkext.length && gwbody && gwbody.length;
+	console.log('ready',ready);
+	return ready;
+};
 
 //import {FontFace,FontFaceMap } from './interfaces.ts';
 
@@ -3436,6 +3440,7 @@ exports.getGID = getGID;
 exports.getGlyph = getGlyph;
 exports.getLastComps = getLastComps;
 exports.gid2ch = gid2ch;
+exports.isDataReady = isDataReady;
 exports.isFontReady = isFontReady;
 exports.loadComponents = loadComponents;
 exports.serializeGlyphUnit = serializeGlyphUnit;
