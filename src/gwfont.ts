@@ -148,7 +148,6 @@ export const getGlyph=s=>{
 		}
     }
 	const r=unpackGD(data);
-	console.log(gid,r)
 	return r
 };
 
