@@ -1,5 +1,6 @@
 import {openPtk} from 'ptk/basket/openptk.ts'
 import {LEMMA_DELIMITER,StringArray} from 'ptk/utils/stringarray.ts'
+import Hzpx from './web.ts'
 export * from'./web.ts'
 import { setFontPtk } from './src/gwfont.ts'
 export const loadPtkFont= async ()=>{
@@ -14,3 +15,4 @@ export const loadPtkFont= async ()=>{
 	setFontPtk(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
 }
 
+export default Hzpx;
