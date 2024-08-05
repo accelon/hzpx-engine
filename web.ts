@@ -1,7 +1,6 @@
 import {splitUTF32Char} from 'ptk/utils/unicode.ts'
 import {CJKRangeName} from 'ptk/utils/cjk.ts'
 
-
 export * from './src/fontface.ts'
 export * from './src/pinx.ts'
 
@@ -65,7 +64,7 @@ export const renderPinx=(ele, text='')=>{
 	return ele.innerText;
 }
 
-import {isFontReady,getLastComps, gid2ch,getGlyph,addFontData,isDataReady} from './src/gwfont.ts'
+import {isFontReady,getLastComps, gid2ch,getGlyph,addFontData,isDataReady, derivedOf} from './src/gwfont.ts'
 
 export const loadFont=()=>{
 	setFont(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
@@ -87,7 +86,6 @@ export const renderSelector=(selector='.hzpx')=>{
 	const eles=document.querySelectorAll(selector);
 	eles.forEach(ele=>Hzpx.injectPinx(ele))
 }
-export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,getLastComps,addFontData};
 
 if (typeof window!=='undefined' && !window.Hzpx) {
 	window.Hzpx=Hzpx;
@@ -101,6 +99,8 @@ if (typeof window!=='undefined') {
 	},1);	
 }
 
+
+export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,getLastComps,addFontData,derivedOf};
 
 export {drawPinx, isFontReady, getLastComps, gid2ch, drawGlyph,getGlyph,isDataReady};
 export default Hzpx;

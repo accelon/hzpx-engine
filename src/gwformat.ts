@@ -79,6 +79,7 @@ export const getGlyph_wiki=gid=>{ //get from raw wiki format
 	}
 	return gw[at].slice(84);
 }
+
 export const prepareForNodejs=(bmp)=>{
 	let at=bmp[0].indexOf('`');
 	if (~at) bmp[0]=bmp[0].slice(at+1);
@@ -88,5 +89,5 @@ export const prepareForNodejs=(bmp)=>{
 	if (!bmp[bmp.length-1]) bmp.pop();
 	gw=bmp;
 	// if (_basing)basing=_basing.sort(alphabetically);
-	// buildDerivedIndex();
+	//buildDerivedIndex();
 }

@@ -325,7 +325,6 @@ const getGlyph=s=>{
 		const at= bsearch(gwgid,gid);
 		if (~at && gid.startsWith(gwgid[at])) {
 			data=gwbody[at];
-			
 		}
     }
 	const r=unpackGD(data);
@@ -428,6 +427,54 @@ const isDataReady=()=>{
 	const ready= cjkbmp && cjkbmp.length && cjkext && cjkext.length && gwbody && gwbody.length;
 	console.log('ready',ready);
 	return ready;
+};
+
+
+const eachGlyph=(cb)=>{
+	if (gidarr.length) {
+		for (let i=0;i<gidarr.length;i++) {
+			cb( gidarr[i], unpackGD(gwbody[i]));
+		}	
+	} else {
+		for (let i=0;i<cjkbmp.length;i++) {
+			cb( 'u'+(0x3400+i).toString(16), unpackGD(cjkbmp[i]).split('$'));
+		}
+		for (let i=0;i<cjkext.length;i++) {
+			cb( 'u'+(0x20000+i).toString(16), unpackGD(cjkext[i]).split('$'));
+		}
+		for (let i=0;i<gwgid.length;i++) {
+			cb( gwgid[i], gwbody[i].split('$'));
+		}
+	}
+};
+let deriveready=false;
+const inverted={};
+const buildDerivedIndex=()=>{
+	//console.time('derivedindex')
+	eachGlyph((gid,data)=>{
+		const mm=gid.match(/u([\da-f]{4,5})/);
+		if (!mm) return;
+		const word=String.fromCodePoint( parseInt(mm[1],16));
+		for (let i=0;i<data.length;i++) {
+			if (!data[i].startsWith('99')) continue;
+			const items=data[i].split(':');
+			const part=items[7];
+			const m=part.match(/u([\da-f]{4,5})/);
+			if (m) {
+				const ch=String.fromCodePoint( parseInt(m[1],16));
+				if (ch==word) continue;
+				if (! inverted[ch] ) inverted[ch]=[];
+				if (!~inverted[ch].indexOf(word)) inverted[ch].push(word);
+			}
+		}
+	});
+	//console.timeEnd('derivedindex')
+	//console.log(inverted)
+	deriveready=true;
+};
+const derivedOf=(ch)=>{
+	if (!deriveready) buildDerivedIndex();
+	return inverted[ch];
 };
 
 //import {FontFace,FontFaceMap } from './interfaces.ts';
@@ -3428,10 +3475,12 @@ exports.autoPinx = autoPinx;
 exports.ch2gid = ch2gid;
 exports.componentsOf = componentsOf;
 exports.componentsOfGD = componentsOfGD;
+exports.derivedOf = derivedOf;
 exports.deserializeGlyphUnit = deserializeGlyphUnit;
 exports.drawGlyph = drawGlyph;
 exports.drawPinx = drawPinx;
 exports.drawPinxChar = drawPinxChar;
+exports.eachGlyph = eachGlyph;
 exports.enumFontFace = enumFontFace;
 exports.factorsOfGD = factorsOfGD;
 exports.frameOf = frameOf;

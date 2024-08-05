@@ -1,4 +1,4 @@
-import {getGlyph,componentsOf, factorsOfGD} from './gwfont.ts'
+import {getGlyph,componentsOf, factorsOfGD,eachGlyph} from './gwfont.ts'
 import {splitUTF32Char,codePointLength,intersect} from "./ptkutils.ts"
 
 export const autoPinx=(ch,base)=>{
