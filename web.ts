@@ -4,6 +4,10 @@ import {CJKRangeName} from 'ptk/utils/cjk.ts'
 export * from './src/fontface.ts'
 export * from './src/pinx.ts'
 
+import {isFontReady,getLastComps, gid2ch,getGlyph,addFontData,isDataReady, derivedOf} from './src/gwfont.ts'
+export const Hzpx={isFontReady, drawPinx,getLastComps,addFontData,derivedOf}
+
+
 const inRange=(s,cjkranges )=>{
 	const rangename=CJKRangeName(s);
 	return ~cjkranges.indexOf(rangename);
@@ -64,7 +68,6 @@ export const renderPinx=(ele, text='')=>{
 	return ele.innerText;
 }
 
-import {isFontReady,getLastComps, gid2ch,getGlyph,addFontData,isDataReady, derivedOf} from './src/gwfont.ts'
 
 export const loadFont=()=>{
 	setFont(ptk,gidarr,gwcomp_starts,bmp_starts,ext_starts,0)
@@ -99,8 +102,10 @@ if (typeof window!=='undefined') {
 	},1);	
 }
 
+Hzpx.loadFont=loadFont
+Hzpx.injectPinx=injectPinx
+Hzpx.renderPinx=renderPinx;
+Hzpx.ready=ready;
 
-export const Hzpx={ready,isFontReady, drawPinx,loadFont, injectPinx, renderPinx,getLastComps,addFontData,derivedOf};
-
-export {drawPinx, isFontReady, getLastComps, gid2ch, drawGlyph,getGlyph,isDataReady};
+export {drawPinx, isFontReady, getLastComps, gid2ch, drawGlyph,getGlyph,isDataReady,derivedOf};
 export default Hzpx;
